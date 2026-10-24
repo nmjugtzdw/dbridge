@@ -1,0 +1,28 @@
+# 编译产物
+target/
+out/
+*.class
+*.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# 系统
+.DS_Store
+Thumbs.db
+
+# 本地运行数据（绝不提交）
+data/
+logs/
+work/
+*.mv.db
+*.lic
+
+# 密钥与配置（绝不提交）
+keys/
+*.p12
+*.jks
+application.properties
+.env
