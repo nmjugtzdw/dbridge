@@ -36,7 +36,7 @@
 
 ![数据源管理](docs/images/datasource.png)
 
-添加 MySQL / SQL Server / PostgreSQL 数据源，测试连接显示真实版本与延迟，账号密码加密存储、脱敏显示，并对低于官方支持的库版本自动给出换驱动建议。
+添加 MySQL / MariaDB / Oracle / PostgreSQL / SQL Server / TiDB / OceanBase / Greenplum 八种数据源，测试连接显示真实版本与延迟，账号密码加密存储、脱敏显示，并对低于官方支持的库版本自动给出换驱动建议。
 
 ### 同步任务 / Sync Jobs
 
@@ -60,7 +60,7 @@
 
 ## ✨ 产品能做什么 / What It Does
 
-- **图形化数据源管理**：MySQL / SQL Server / PostgreSQL 三种数据库，填主机、端口、账号、密码即可，测试连接一键通过。
+- **图形化数据源管理**：MySQL / MariaDB / Oracle / PostgreSQL / SQL Server / TiDB / OceanBase / Greenplum 八种数据库，填主机、端口、账号、密码即可，测试连接一键通过。
 - **选表选字段**：不用手写 SQL 或配置文件，勾选要同步的表和字段就行。
 - **自动建目标表**：目标库没有对应表时自动建表，字段类型自动映射。
 - **字段自动匹配**：源表与目标表字段按同名、别名、中文注释等 9 级打分自动对应，省去手工对齐。
@@ -112,11 +112,11 @@
 | 断点续传 | ✅ 切片续传 | ❌ | ✅ | ⚠️ |
 | 增量同步 | ✅ 6 种水位 | ⚠️ 手动时间戳 | ✅ | ✅ |
 | CDC 秒级实时 | ❌ | ⚠️ | ✅ | ❌ |
-| 国产库（达梦等） | ❌ | ⚠️ 部分 | ⚠️ | ✅ |
+| 国产库（达梦等） | ⚠️ 部分（OceanBase） | ⚠️ 部分 | ⚠️ | ✅ |
 
 **我们最强的三点**：① 免装环境的图形化（目标用户零门槛）；② 三层防错护栏 + 一致性校验（写坏数据前先拦住，独家）；③ 断点续传 + 增量水位（不重不漏）。
 
-**我们暂时弱的三点**：国产库覆盖、存储过程/视图等对象同步、CDC 秒级实时——都在路线图上。
+**我们暂时弱的三点**：国产库覆盖（已支持 OceanBase，达梦/金仓等在路线图）、存储过程/视图等对象同步、CDC 秒级实时——都在路线图上。
 
 完整竞品分析见 [docs/竞品对比分析.md](docs/竞品对比分析.md)。
 
@@ -127,7 +127,7 @@
 | 层 | 技术 |
 |---|---|
 | 后端 | Java 11 · Spring Boot |
-| 数据访问 | JDBC（MySQL / SQL Server / PostgreSQL 驱动） |
+| 数据访问 | JDBC（MySQL / MariaDB / Oracle / PostgreSQL / SQL Server / TiDB / OceanBase / Greenplum 驱动） |
 | 存储 | H2（嵌入式文件库） |
 | 前端 | 原生 HTML / CSS / JS（单页，无框架） |
 | 同步引擎 | Apache SeaTunnel |
@@ -220,7 +220,7 @@ docker run -d --name dbridge -p 27301:27301 \
 | `启动.bat` / `start.sh` | 启动控制台（Windows / Linux） |
 | `lib\dbridge.jar` | 主程序 |
 | `runtime\jdk11\` | 内置 Java 11（lite 版没有，检测时下载） |
-| `drivers\` | 数据库驱动（MySQL / PostgreSQL / SQL Server） |
+| `drivers\` | 数据库驱动（MySQL / MariaDB / Oracle / PostgreSQL / SQL Server / TiDB / OceanBase / Greenplum） |
 | `data\` | 你的数据、账号等，**备份就拷这个目录** |
 | `logs\` | 运行日志，出问题时打包这个目录发给支持方 |
 | `work\` | 临时目录，可整个删除，会自动重建 |
@@ -239,7 +239,7 @@ docker run -d --name dbridge -p 27301:27301 \
 
 | 版本 | 日期 | 更新内容 |
 |---|---|---|
-| **v1.0.6** | 2026-10-25 | 新增 Docker 容器化部署（含 SeaTunnel 同步引擎）；新增 Linux/Docker 一键拉取安装；修复若干 bug，提升稳定性 |
+| **v1.0.6** | 2026-10-25 | 数据库类型从 3 种扩展至 8 种（新增 Oracle / MariaDB / TiDB / OceanBase / Greenplum）；新增 Docker 容器化部署（含 SeaTunnel 同步引擎）；新增 Linux/Docker 一键拉取安装；修复若干 bug，提升稳定性 |
 | v1.0.5 | 2026-10-25 | 修复若干 bug，提升稳定性；界面优化：去掉会员 Tab、新增关于页、版权沉底、会员徽章快到期提醒等 |
 | v1.0.4 | 2026-10-25 | 数据源列表新增「隐私保护」按钮（一键隐藏 IP 和账号）；新增「测速」功能（延迟列 + 一键测速） |
 | v1.0.3 | 2026-10-25 | 关于页新增作者信息与客服联系方式，其他细节优化 |
