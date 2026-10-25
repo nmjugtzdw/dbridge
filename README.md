@@ -13,6 +13,7 @@
 [![Java](https://img.shields.io/badge/Java-11-blue?style=flat-square)]()
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.7.18-brightgreen?style=flat-square)]()
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux-lightgrey?style=flat-square)]()
+[![Docker](https://img.shields.io/badge/Docker-支持-blue?style=flat-square&logo=docker)](deploy/docker/README.md)
 
 </div>
 
@@ -135,6 +136,16 @@
 
 ## 🚀 部署方法 / Deployment
 
+DBridge 支持三种部署方式，功能完全一致，按你的环境任选其一：
+
+| 方式 | 适用场景 | 入口 |
+|---|---|---|
+| 🪟 **Windows** | 个人电脑 / Windows 服务器 | 解压 zip 双击 `启动.bat` |
+| 🐧 **Linux** | Linux 服务器（裸机部署） | 解压 tar 跑启动脚本 |
+| 🐳 **Docker** | 已有 Docker 环境 / 云服务器 | `docker run` 或 `docker compose` |
+
+### 🪟 Windows 部署
+
 分两种包，功能完全一致，只差 Java 环境：
 
 | 包 | 大小 | 说明 |
@@ -142,26 +153,68 @@
 | **lite 版** | 约 40 MB | 不含 Java。解压后先跑「环境检测.bat」，自动下载 JDK 与数据库驱动（需能上外网） |
 | **full 版** | 约 95 MB | 内置 Java 11，解压即用，适合内网、不能上外网的机器 |
 
-### 三步装起来 / 3-Step Install
+#### 三步装起来 / 3-Step Install
 
 1. **解压**：把压缩包整个解压到硬盘（例如 `D:\DBridge`）。不要放 `C:\Program Files`，也不要在压缩包里直接双击运行——那里没有写权限。路径里尽量不要有中文。
 2. **检测环境**：双击「环境检测.bat」，逐项检查并给出结论（`OK` / `注意` / `失败`）。缺 Java 自动下载、缺驱动自动补齐，全部通过后生成环境配置。
 3. **启动**：双击「启动.bat」，等约 10 秒，浏览器打开 `http://localhost:27301`。那个黑色窗口就是服务本身，关掉即停止服务。
 
+#### 开机自启 / Auto-Start
+
+给「启动.bat」建快捷方式放进启动文件夹（`Win+R` → `shell:startup`），或用「任务计划程序」创建「计算机启动时」运行的任务。
+
+### 🐧 Linux 部署
+
+Linux 服务器裸机部署，解压后运行启动脚本即可（同样内置 Java，无需预装 JDK）：
+
+```bash
+# 1. 解压
+tar -xzf dbridge-linux-1.0.5.tar.gz
+cd dbridge
+
+# 2. 启动（后台运行，日志写入 logs/）
+./start.sh
+
+# 3. 浏览器打开 http://服务器IP:27301
+```
+
+停止服务：`./stop.sh`（或直接 kill 进程）。
+
+### 🐳 Docker 部署
+
+镜像自带 Java 运行时与同步引擎，一条命令即可拉起，数据用 volume 持久化：
+
+```bash
+# 方式一：docker compose
+cd deploy/docker
+docker compose up -d
+
+# 方式二：docker run
+docker run -d --name dbridge -p 27301:27301 \
+  -v dbridge-data:/opt/dbridge/data \
+  -v /etc/machine-id:/etc/machine-id:ro \
+  -e DBRIDGE_LICENSE_URL=https://dbridge.zzzmxxkj.com \
+  -e TZ=Asia/Shanghai \
+  --restart unless-stopped dbridge:1.0.5
+```
+
+浏览器打开 `http://localhost:27301`。
+
+> **内网离线分发**：客户内网上不了 Docker Hub 时，用 `docker save dbridge:1.0.5 -o dbridge.tar`
+> 导出镜像，客户侧 `docker load -i dbridge.tar` 导入即可，完全离线。
+>
+> 完整说明（含指纹锚定、同步引擎、升级流程）见 [deploy/docker/README.md](deploy/docker/README.md)。
+
 ### 首次登录 / First Login
 
 出厂账号 `admin`，登录后系统会引导修改密码。忘了密码可以用环境变量重置（详见交付说明）。
-
-### 开机自启 / Auto-Start
-
-给「启动.bat」建快捷方式放进启动文件夹（`Win+R` → `shell:startup`），或用「任务计划程序」创建「计算机启动时」运行的任务。
 
 ### 文件结构 / File Layout
 
 | 文件 / 目录 | 用途 |
 |---|---|
-| `环境检测.bat` | 检查环境、自动下载 Java 与数据库驱动 |
-| `启动.bat` | 启动控制台 |
+| `环境检测.bat` | 检查环境、自动下载 Java 与数据库驱动（Windows lite 版） |
+| `启动.bat` / `start.sh` | 启动控制台（Windows / Linux） |
 | `lib\dbridge.jar` | 主程序 |
 | `runtime\jdk11\` | 内置 Java 11（lite 版没有，检测时下载） |
 | `drivers\` | 数据库驱动（MySQL / PostgreSQL / SQL Server） |
@@ -208,6 +261,8 @@ dbridge-open/
 ├── docs/             文档与截图
 │   ├── 竞品对比分析.md
 │   └── images/       界面截图
+├── deploy/
+│   └── docker/       Docker 部署文件（Dockerfile / compose / 构建与升级脚本）
 └── examples/         通用示例代码（不涉及核心逻辑）
     ├── DbTypeExample.java       多数据库 JDBC 连接串拼接的通用写法
     └── CronTextExample.java     cron 表达式的人类可读解析示例
