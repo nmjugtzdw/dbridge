@@ -26,3 +26,8 @@ keys/
 *.jks
 application.properties
 .env
+
+# Docker 构建产物（jar、驱动、引擎副本，构建前从本地 target/ 和 drivers/ 和 D:/seatunnel 组装，绝不提交）
+deploy/docker/lib/
+deploy/docker/drivers/
+deploy/docker/engine/
