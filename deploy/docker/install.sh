@@ -34,6 +34,23 @@ say() { printf '\n\033[1;36m== %s\033[0m\n' "$*"; }
 ok()  { printf '\033[1;32m✓ %s\033[0m\n' "$*"; }
 err() { printf '\033[1;31m✗ %s\033[0m\n' "$*" >&2; exit 1; }
 
+# ---------- 0. 宣传横幅 ----------
+banner() {
+  printf '\033[1;36m'
+  cat <<'EOF'
+  ┌─────────────────────────────────────────────┐
+  │                                             │
+  │     ██╗ 数桥 DBridge · 异构数据库同步控制台    │
+  │                                             │
+  │     作者：木思丁     微信：zzzmxxkj           │
+  │     公众号：桢鸣科技                          │
+  │     官网：www.zzzmxxkj.com                   │
+  │                                             │
+  └─────────────────────────────────────────────┘
+EOF
+  printf '\033[0m\n'
+}
+banner
 say "数桥 DBridge 一键安装（版本 ${VER}）"
 
 # ---------- 1. 检查 root ----------
@@ -93,3 +110,8 @@ echo "  查看日志：docker logs -f ${CONTAINER}"
 echo "  查看状态：docker ps --filter name=${CONTAINER}"
 echo ""
 echo "  （记得在云安全组/防火墙放行 ${PORT} 端口）"
+echo ""
+printf '\033[1;36m'
+echo "  数桥 DBridge —— 图形化异构数据库同步控制台"
+echo "  作者：木思丁 · 微信：zzzmxxkj · 公众号：桢鸣科技 · 官网：www.zzzmxxkj.com"
+printf '\033[0m'
