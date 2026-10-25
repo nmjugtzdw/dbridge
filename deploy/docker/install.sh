@@ -36,16 +36,36 @@ err() { printf '\033[1;31m✗ %s\033[0m\n' "$*" >&2; exit 1; }
 
 # ---------- 0. 宣传横幅 ----------
 banner() {
+  # 用 printf 动态计算每行"显示宽度"（中文算 2 列），画一个对齐的方框
+  local line1="数桥 DBridge · 异构数据库同步控制台"
+  local line2="作者：木思丁    微信：zzzmxxkj"
+  local line3="公众号：桢鸣科技"
+  local line4="官网：www.zzzmxxkj.com"
+  local w=0 tw i ch c
+  for s in "$line1" "$line2" "$line3" "$line4"; do
+    tw=0
+    for ((i=0; i<${#s}; i++)); do
+      ch="${s:$i:1}"
+      c=$(printf '%d' "'$ch")
+      if [ "$c" -le 127 ]; then tw=$((tw+1)); else tw=$((tw+2)); fi
+    done
+    [ "$tw" -gt "$w" ] && w=$tw
+  done
+  local bar; bar=$(printf '%*s' "$((w+2))" '' | tr ' ' '─')
   printf '\033[1;36m'
-  cat <<'EOF'
-═══════════════════════════════════════════════
-  数桥 DBridge · 异构数据库同步控制台
-═══════════════════════════════════════════════
-  作者：木思丁    微信：zzzmxxkj
-  公众号：桢鸣科技
-  官网：www.zzzmxxkj.com
-═══════════════════════════════════════════════
-EOF
+  printf '┌%s┐\n' "$bar"
+  for s in "$line1" "$line2" "$line3" "$line4"; do
+    tw=0
+    for ((i=0; i<${#s}; i++)); do
+      ch="${s:$i:1}"
+      c=$(printf '%d' "'$ch")
+      if [ "$c" -le 127 ]; then tw=$((tw+1)); else tw=$((tw+2)); fi
+    done
+    local pad=$((w-tw)) out="$s"
+    while [ $pad -gt 0 ]; do out="${out} "; pad=$((pad-1)); done
+    printf '│ %s │\n' "$out"
+  done
+  printf '└%s┘\n' "$bar"
   printf '\033[0m\n'
 }
 banner
