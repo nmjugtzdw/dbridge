@@ -196,7 +196,6 @@
 ## 👤 作者 / Author
 
 - **作者 / Author**：木思丁
-- **发卡平台 / License Store**：https://ka.zzzmxxkj.com/cat/2
 
 ---
 
