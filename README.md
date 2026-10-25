@@ -169,7 +169,7 @@ Linux 服务器裸机部署，解压后运行启动脚本即可（同样内置 J
 
 ```bash
 # 1. 解压
-tar -xzf dbridge-linux-1.0.5.tar.gz
+tar -xzf dbridge-linux-1.0.6.tar.gz
 cd dbridge
 
 # 2. 启动（后台运行，日志写入 logs/）
@@ -185,22 +185,25 @@ cd dbridge
 镜像自带 Java 运行时与同步引擎，一条命令即可拉起，数据用 volume 持久化：
 
 ```bash
-# 方式一：docker compose
+# 方式一：一键安装（推荐，自动检测 Docker 并下载镜像）
+bash <(curl -sL https://dbridge.zzzmxxkj.com/install.sh) 1.0.6
+
+# 方式二：docker compose
 cd deploy/docker
 docker compose up -d
 
-# 方式二：docker run
+# 方式三：docker run
 docker run -d --name dbridge -p 27301:27301 \
   -v dbridge-data:/opt/dbridge/data \
   -v /etc/machine-id:/etc/machine-id:ro \
   -e DBRIDGE_LICENSE_URL=https://dbridge.zzzmxxkj.com \
   -e TZ=Asia/Shanghai \
-  --restart unless-stopped dbridge:1.0.5
+  --restart unless-stopped dbridge:1.0.6
 ```
 
 浏览器打开 `http://localhost:27301`。
 
-> **内网离线分发**：客户内网上不了 Docker Hub 时，用 `docker save dbridge:1.0.5 -o dbridge.tar`
+> **内网离线分发**：客户内网上不了 Docker Hub 时，用 `docker save dbridge:1.0.6 -o dbridge.tar`
 > 导出镜像，客户侧 `docker load -i dbridge.tar` 导入即可，完全离线。
 >
 > 完整说明（含指纹锚定、同步引擎、升级流程）见 [deploy/docker/README.md](deploy/docker/README.md)。
@@ -236,7 +239,8 @@ docker run -d --name dbridge -p 27301:27301 \
 
 | 版本 | 日期 | 更新内容 |
 |---|---|---|
-| **v1.0.5** | 2026-10-25 | 修复若干 bug，提升稳定性；界面优化：去掉会员 Tab、新增关于页、版权沉底、会员徽章快到期提醒等 |
+| **v1.0.6** | 2026-10-25 | 新增 Docker 容器化部署（含 SeaTunnel 同步引擎）；新增 Linux/Docker 一键拉取安装；修复若干 bug，提升稳定性 |
+| v1.0.5 | 2026-10-25 | 修复若干 bug，提升稳定性；界面优化：去掉会员 Tab、新增关于页、版权沉底、会员徽章快到期提醒等 |
 | v1.0.4 | 2026-10-25 | 数据源列表新增「隐私保护」按钮（一键隐藏 IP 和账号）；新增「测速」功能（延迟列 + 一键测速） |
 | v1.0.3 | 2026-10-25 | 关于页新增作者信息与客服联系方式，其他细节优化 |
 | v1.0.2 | 2026-10-25 | 优化关于页布局，版本号右上角增加更新提示；修复控制台中文日志乱码；首次登录不再强制改密码；修复授权状态角标不及时隐藏的问题 |
