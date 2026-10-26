@@ -12,15 +12,14 @@
 
 services:
   dbridge:
-    build: .
+    # 镜像通过一键安装脚本获取（install.sh）；本地已有 dbridge 镜像时可直接 up
     image: dbridge:1.0.8
     container_name: dbridge
     restart: unless-stopped
     ports:
       - "27301:27301"
     environment:
-      # 授权云端地址（你的授权服务器）。留空则用镜像默认 127.0.0.1:27302
-      # 生产地址固定带 27302 端口：443 已让给软件官网，授权只走 27302
+      # 授权服务地址（必须带 27302 端口，443 用于官网）
       DBRIDGE_LICENSE_URL: "https://dbridge.zzzmxxkj.com:27302"
       # 同步引擎目录（镜像内固定路径，无需改动；见 Dockerfile 的 ENV）
       DBRIDGE_ENGINE_HOME: "/opt/dbridge/engine"
@@ -34,8 +33,7 @@ services:
       - dbridge-data:/opt/dbridge/data
       # 日志挂出来方便排障（可选）
       - dbridge-logs:/opt/dbridge/logs
-      # ★ 关键：挂载宿主机 machine-id，作为设备指纹「os」因子的稳定锚点
-      #   云服务器/虚拟机读不到主板 UUID 时，靠它保证授权不掉（Red Hat 官方镜像同款做法）
+      # 挂载宿主机 machine-id：云服务器上保证授权指纹稳定，容器重建不掉授权
       - /etc/machine-id:/etc/machine-id:ro
     # 连宿主机上的数据库（比如宿主机本机装的 MySQL）时，打开下面这行：
     # extra_hosts:
