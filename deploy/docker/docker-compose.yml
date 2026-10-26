@@ -13,7 +13,7 @@
 services:
   dbridge:
     # 镜像通过一键安装脚本获取（install.sh）；本地已有 dbridge 镜像时可直接 up
-    image: dbridge:1.0.8
+    image: dbridge:latest
     container_name: dbridge
     restart: unless-stopped
     ports:

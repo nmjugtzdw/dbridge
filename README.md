@@ -169,7 +169,7 @@ Linux 服务器裸机部署，解压后运行启动脚本即可（同样内置 J
 
 ```bash
 # 1. 解压
-tar -xzf dbridge-linux-1.0.8.tar.gz
+tar -xzf dbridge-linux.tar.gz
 cd dbridge
 
 # 2. 启动（后台运行，日志写入 logs/）
@@ -188,9 +188,6 @@ cd dbridge
 # 方式一：一键安装（推荐，自动检测 Docker 并下载最新镜像）
 bash <(curl -sL https://dbridge.zzzmxxkj.com/install.sh)
 
-# 装指定版本（回滚用，把 1.0.8 换成目标版本号；不带参数就是最新版）
-bash <(curl -sL https://dbridge.zzzmxxkj.com/install.sh) 1.0.8
-
 # 方式二：docker compose
 cd deploy/docker
 docker compose up -d
@@ -201,12 +198,15 @@ docker run -d --name dbridge -p 27301:27301 \
   -v /etc/machine-id:/etc/machine-id:ro \
   -e DBRIDGE_LICENSE_URL=https://dbridge.zzzmxxkj.com:27302 \
   -e TZ=Asia/Shanghai \
-  --restart unless-stopped dbridge:1.0.8
+  --restart unless-stopped dbridge:latest
 ```
+
+> 三种方式都不需要指定版本号。一键安装脚本会向服务端确认当前最新版并下载，
+> 镜像导入后自动标记为 `dbridge:latest`；升级只需重跑同一条命令。
 
 浏览器打开 `http://localhost:27301`。
 
-> **内网离线分发**：客户内网上不了 Docker Hub 时，用 `docker save dbridge:1.0.8 -o dbridge.tar`
+> **内网离线分发**：客户内网上不了 Docker Hub 时，用 `docker save dbridge:latest -o dbridge.tar`
 > 导出镜像，客户侧 `docker load -i dbridge.tar` 导入即可，完全离线。
 >
 > 完整说明（含指纹锚定、同步引擎、升级流程）见 [deploy/docker/README.md](deploy/docker/README.md)。

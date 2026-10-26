@@ -5,8 +5,8 @@
 # 用法（在客户 Linux 服务器上，一条命令）：
 #   bash <(curl -sL https://dbridge.zzzmxxkj.com/install.sh)      # 装最新版
 #
-# 指定版本（回滚用，把 1.0.8 换成目标版本号；该版本 tar 需仍在分发目录）：
-#   bash <(curl -sL https://dbridge.zzzmxxkj.com/install.sh) 1.0.8
+# 本脚本默认总是安装【最新版】：版本号由服务端 latest.txt 决定，不带参数即可。
+# 仅在需要回滚到某个历史版本时才传版本号（该版本的 tar 必须仍在分发目录）：
 #
 # 端口说明：
 #   客户端对外 27301；授权服务走后端 27302（nginx 终结 TLS → 127.0.0.1:27312）
@@ -102,7 +102,7 @@ step 1 "解析目标版本"
 if [ -z "${VER}" ] || [ "${VER}" = "latest" ]; then
   info "查询 ${BASE_URL}/dist/latest.txt"
   VER="$(curl -fsSL --max-time 10 "${BASE_URL}/dist/latest.txt" 2>/dev/null | tr -d '\r\n ')" || true
-  [ -n "${VER}" ] || err "无法获取最新版本号，请稍后重试；也可以直接指定版本：bash <(curl -sL ${BASE_URL}/install.sh) <版本号>"
+  [ -n "${VER}" ] || err "无法获取最新版本号，请稍后重试（服务端 /dist/latest.txt 不可达）"
   ok "自动识别最新版本 ${VER}"
 else
   ok "使用指定版本 ${VER}"
@@ -172,7 +172,10 @@ fi
 step 4 "导入镜像到本地 Docker"
 docker load -i "${TAR}" >/dev/null 2>&1 || docker load -i "${TAR}" || err "docker load 失败"
 docker image inspect "dbridge:${VER}" >/dev/null 2>&1 || err "导入后未找到镜像 dbridge:${VER}"
-ok "dbridge:${VER} 已就绪"
+# 再打一个 latest 标签：文档里的 docker run / compose 用的是 dbridge:latest，
+# 客户从 GitHub 复制命令时不该被钉在某个版本号上
+docker tag "dbridge:${VER}" dbridge:latest >/dev/null 2>&1 || true
+ok "dbridge:${VER} 已就绪（同时标记为 dbridge:latest）"
 
 # ---------- 5. 启动容器 ----------
 step 5 "启动服务容器"
@@ -253,10 +256,10 @@ row ""
 rowc "  UNINSTALL / REINSTALL" "$CY"
 row ""
 row "  docker rm -f ${CONTAINER}"
-row "  docker rmi dbridge:${VER}"
+row "  docker rmi dbridge:latest dbridge:${VER}"
 row "  docker volume rm dbridge-data     ! clears license and data"
 row ""
 fend
-printf ' 重新安装  %sbash <(curl -sL %s/install.sh) %s%s\n' "$YL" "$BASE_URL" "$VER" "$RS"
+printf ' 重新安装  %sbash <(curl -sL %s/install.sh)%s\n' "$YL" "$BASE_URL" "$RS"
 printf '\n %s数桥 DBridge%s  图形化异构数据库同步控制台\n' "$CY" "$RS"
 printf ' %s作者 木思丁 · 微信 zzzmxxkj · 公众号 桢鸣科技%s\n\n' "$DM" "$RS"

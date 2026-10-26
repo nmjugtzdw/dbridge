@@ -19,11 +19,8 @@ bash <(curl -sL https://dbridge.zzzmxxkj.com/install.sh)
 
 脚本会自动完成：检查 Docker → 下载镜像包 → sha256 校验 → `docker load` → 启动容器 → 等接口就绪后打印访问地址。
 
-需要固定版本（回滚用）时加一个参数：
-
-```bash
-bash <(curl -sL https://dbridge.zzzmxxkj.com/install.sh) 1.0.8
-```
+脚本不带参数，**永远装当前最新版**（版本号由服务端 `latest.txt` 决定，镜像导入后自动标记为
+`dbridge:latest`）。升级不用改命令，重跑同一条即可，数据卷与授权都保留。
 
 下载走 HTTPS 直连，支持断点续传，不依赖 Docker Hub，内网/国内环境也能用。
 
@@ -40,7 +37,7 @@ docker run -d \
   -e DBRIDGE_LICENSE_URL=https://dbridge.zzzmxxkj.com:27302 \
   -e TZ=Asia/Shanghai \
   --restart unless-stopped \
-  dbridge:1.0.8
+  dbridge:latest
 ```
 
 浏览器打开 `http://localhost:27301`，首次登录 `admin / admin123`，登录后会引导改密码。
@@ -57,7 +54,7 @@ cd deploy/docker
 docker compose up -d
 ```
 
-前提是本地已有 `dbridge:1.0.8` 镜像（一键安装脚本会自动准备）。compose 只负责启动，不负责拉镜像。
+前提是本地已有 `dbridge:latest` 镜像（一键安装脚本会自动准备）。compose 只负责启动，不负责拉镜像。
 
 ---
 
@@ -106,10 +103,10 @@ bash <(curl -sL https://dbridge.zzzmxxkj.com/install.sh)
 
 ```bash
 # 有网环境导出（约 418MB）
-docker save dbridge:1.0.8 -o dbridge-1.0.8.tar
+docker save dbridge:latest -o dbridge.tar
 
 # 客户侧导入
-docker load -i dbridge-1.0.8.tar
+docker load -i dbridge.tar
 ```
 
 导入后按第二节的 `docker run` 启动即可，全程不需要外网。
