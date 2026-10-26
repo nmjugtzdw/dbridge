@@ -1,0 +1,16 @@
+* text=auto
+
+# 客户侧 Linux 脚本必须是 LF：Windows 上 core.autocrlf=true 会把工作区改写成 CRLF，
+# 一旦带着 CRLF 发布出去，客户 bash <(curl ...) 会报 $'\r': command not found
+*.sh   text eol=lf
+*.yml  text eol=lf
+*.yaml text eol=lf
+Dockerfile text eol=lf
+
+*.bat  text eol=crlf
+*.cmd  text eol=crlf
+*.ps1  text eol=crlf
+
+*.png  binary
+*.zip  binary
+*.tar  binary
