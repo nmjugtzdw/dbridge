@@ -10,7 +10,7 @@
 | 二、docker compose | 本机已有 `dbridge:latest` 镜像 + 本仓库的 compose 文件 | ❌ 不会 |
 | 三、docker run | 本机已有 `dbridge:latest` 镜像 | ❌ 不会 |
 
-镜像只有两个来源：**跑过一次方式一**，或**手动 `docker load` 我们提供的 tar**。
+镜像只有两个来源：**跑过一次方式一**，或**用 curl 从分发地址下载 tar 再 `docker load`**（见第七节）。
 本项目不发布到 Docker Hub，`docker pull` 拉不到。
 
 | 端口 | 用途 |
@@ -111,12 +111,34 @@ bash <(curl -sL https://dbridge.zzzmxxkj.com/install.sh)
 
 ---
 
-## 七、内网 / 离线部署
+## 七、下载镜像 / 离线部署
 
-客户内网上不了外网时，用镜像包离线分发：
+### 直接下载（机器能上外网）
+
+镜像包放在分发服务器上，一条 `curl` 就行，不需要 Docker Hub：
 
 ```bash
-# 有网环境导出（约 418MB）
+curl -fL -C - --progress-bar -o dbridge.tar \
+  https://dbridge.zzzmxxkj.com/dist/dbridge-docker-latest.tar
+docker load -i dbridge.tar
+```
+
+`dbridge-docker-latest.tar` 是软链，永远指向当前最新版；`-C -` 支持断点续传。
+
+按版本号下载并校验（约 418MB）：
+
+```bash
+V=$(curl -s https://dbridge.zzzmxxkj.com/dist/latest.txt)
+curl -fL -C - --progress-bar -o dbridge.tar \
+  https://dbridge.zzzmxxkj.com/dist/dbridge-docker-$V.tar
+curl -fsSL https://dbridge.zzzmxxkj.com/dist/dbridge-docker-$V.tar.sha256 \
+  | sed "s/dbridge-docker-$V.tar/dbridge.tar/" | sha256sum -c -
+```
+
+### 完全离线（客户内网出不去）
+
+```bash
+# 有网环境导出（约 418MB，也可以直接用上面的 curl 下 tar）
 docker save dbridge:latest -o dbridge.tar
 
 # 客户侧导入

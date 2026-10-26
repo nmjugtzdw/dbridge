@@ -201,6 +201,32 @@ bash <(curl -sL https://dbridge.zzzmxxkj.com/install.sh)
 
 所以**不需要先下载任何安装包**——脚本就是安装包本身。
 
+#### 先手动拿到镜像（方式二、三都依赖这一步）
+
+镜像包就放在同一台服务器上，客户可以直接用 `curl` 拉，**不需要 Docker Hub 账号**：
+
+```bash
+# 一条命令下载（-C - 断点续传：网断了重跑同一条会接着下）
+curl -fL -C - --progress-bar -o dbridge.tar \
+  https://dbridge.zzzmxxkj.com/dist/dbridge-docker-latest.tar
+
+# 导入（tar 里已带 dbridge:latest 与 dbridge:<版本> 两个标签）
+docker load -i dbridge.tar
+```
+
+`dbridge-docker-latest.tar` 是软链，**永远指向当前最新版**，所以这条命令可以长期用，
+升级就是删掉旧镜像再跑一遍。
+
+需要校验完整性时，按版本号下（约 418MB）：
+
+```bash
+V=$(curl -s https://dbridge.zzzmxxkj.com/dist/latest.txt)
+curl -fL -C - --progress-bar -o dbridge.tar \
+  https://dbridge.zzzmxxkj.com/dist/dbridge-docker-$V.tar
+curl -fsSL https://dbridge.zzzmxxkj.com/dist/dbridge-docker-$V.tar.sha256 \
+  | sed "s/dbridge-docker-$V.tar/dbridge.tar/" | sha256sum -c -
+```
+
 #### 方式二：docker compose（需已有镜像 + 仓库里的 compose 文件）
 
 ```bash
@@ -232,8 +258,9 @@ docker run -d --name dbridge -p 27301:27301 \
 
 #### 镜像从哪来
 
-只有两条路：**跑过方式一**，或用我们提供的 tar 手动 `docker load`。本项目**不发布到
-Docker Hub**，所以 `docker pull dbridge` 是拉不到的。
+只有两条路：**跑过方式一**，或用上一节的 `curl` 命令把 tar 下下来再 `docker load`。
+本项目**不发布到 Docker Hub**，所以 `docker pull dbridge` 是拉不到的——
+“拉镜像”在我们这里就等于“curl 一个 tar 再 load”。
 
 浏览器打开 `http://localhost:27301`。
 
