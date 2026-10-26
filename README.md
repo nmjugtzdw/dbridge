@@ -181,17 +181,45 @@ cd dbridge
 
 ### 🐳 Docker 部署
 
-镜像自带 Java 运行时与同步引擎，一条命令即可拉起，数据用 volume 持久化：
+三种方式对应两种用法：**方式一是「一条命令全自动」**，方式二、三是「我自己控制容器」。
+只有方式一不需要任何前置；方式二、三都**假设本机已经有 `dbridge:latest` 镜像**。
+
+#### 方式一：一键安装（推荐，零前置）
 
 ```bash
-# 方式一：一键安装（推荐，自动检测 Docker 并下载最新镜像）
 bash <(curl -sL https://dbridge.zzzmxxkj.com/install.sh)
+```
 
-# 方式二：docker compose
-cd deploy/docker
+这一条命令里脚本会依次做：
+
+1. 检查 Docker，没有就自动装（阿里云镜像源）；
+2. 读服务端 `latest.txt` 得知当前最新版本，不需要你指定版本号；
+3. 下载 `dbridge-docker-<版本>.tar`（约 418MB，支持断点续传 + sha256 校验）；
+4. `docker load` 导入镜像，并同时标记为 `dbridge:latest`；
+5. 用固定参数启动容器：端口 27301、数据卷 `dbridge-data`、挂载 `/etc/machine-id`、授权地址、时区；
+6. 轮询 `/api/about/version` 确认真的起来了，再打印访问地址。
+
+所以**不需要先下载任何安装包**——脚本就是安装包本身。
+
+#### 方式二：docker compose（需已有镜像 + 仓库里的 compose 文件）
+
+```bash
+# 1) 先让本机有镜像：跑过一次方式一，或手动导入镜像包
+docker load -i dbridge-docker-<版本>.tar
+
+# 2) 用仓库里的 compose 文件起容器
+git clone https://github.com/nmjugtzdw/dbridge
+cd dbridge/deploy/docker
 docker compose up -d
+```
 
-# 方式三：docker run
+> `deploy/docker/` 只存在于 **GitHub 仓库**。Windows 客户端 zip 里没有这个目录，
+> 所以在客户端包里是 `cd` 不进 `deploy/docker` 的。compose 只负责「按文件里的参数启动容器」，
+> 它**不会**帮你下载镜像。
+
+#### 方式三：docker run（需已有镜像，参数自己写）
+
+```bash
 docker run -d --name dbridge -p 27301:27301 \
   -v dbridge-data:/opt/dbridge/data \
   -v /etc/machine-id:/etc/machine-id:ro \
@@ -200,12 +228,16 @@ docker run -d --name dbridge -p 27301:27301 \
   --restart unless-stopped dbridge:latest
 ```
 
-> 三种方式都不需要指定版本号。一键安装脚本会向服务端确认当前最新版并下载，
-> 镜像导入后自动标记为 `dbridge:latest`；升级只需重跑同一条命令。
+就是把方式一第 5 步做的事手工写一遍，适合要改端口、改卷路径、接自己编排系统的场景。
+
+#### 镜像从哪来
+
+只有两条路：**跑过方式一**，或用我们提供的 tar 手动 `docker load`。本项目**不发布到
+Docker Hub**，所以 `docker pull dbridge` 是拉不到的。
 
 浏览器打开 `http://localhost:27301`。
 
-> **内网离线分发**：客户内网上不了 Docker Hub 时，用 `docker save dbridge:latest -o dbridge.tar`
+> **内网离线分发**：客户内网上不了外网时，在有网机器上 `docker save dbridge:latest -o dbridge.tar`
 > 导出镜像，客户侧 `docker load -i dbridge.tar` 导入即可，完全离线。
 >
 > 完整说明（含指纹锚定、同步引擎、升级流程）见 [deploy/docker/README.md](deploy/docker/README.md)。

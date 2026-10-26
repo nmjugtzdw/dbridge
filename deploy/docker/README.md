@@ -2,6 +2,17 @@
 
 镜像自带 Java 11、8 种数据库驱动与 SeaTunnel 同步引擎，一条命令拉起，数据用 volume 持久化。
 
+本文三种启动方式的关系，先看这张表再往下看：
+
+| 方式 | 你需要先有什么 | 是否自动下载镜像 |
+|---|---|---|
+| 一、一键安装脚本 | 一台能上外网的 Linux 服务器 | ✅ 会（连 Docker 都帮你装） |
+| 二、docker compose | 本机已有 `dbridge:latest` 镜像 + 本仓库的 compose 文件 | ❌ 不会 |
+| 三、docker run | 本机已有 `dbridge:latest` 镜像 | ❌ 不会 |
+
+镜像只有两个来源：**跑过一次方式一**，或**手动 `docker load` 我们提供的 tar**。
+本项目不发布到 Docker Hub，`docker pull` 拉不到。
+
 | 端口 | 用途 |
 |---|---|
 | 27301 | 控制台（Web 界面） |
@@ -50,11 +61,14 @@ docker run -d \
 ## 三、docker compose
 
 ```bash
-cd deploy/docker
+# 前置：本机已有 dbridge:latest（跑过方式一，或 docker load 导入了镜像包）
+git clone https://github.com/nmjugtzdw/dbridge
+cd dbridge/deploy/docker
 docker compose up -d
 ```
 
-前提是本地已有 `dbridge:latest` 镜像（一键安装脚本会自动准备）。compose 只负责启动，不负责拉镜像。
+compose 只负责「按 `docker-compose.yml` 里的参数启动容器」，**不会下载镜像**。
+`deploy/docker/` 目录只存在于 GitHub 仓库，Windows 客户端 zip 里没有它。
 
 ---
 
