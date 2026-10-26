@@ -118,7 +118,6 @@
 
 **我们暂时弱的三点**：国产库覆盖（已支持 OceanBase，达梦/金仓等在路线图）、存储过程/视图等对象同步、CDC 秒级实时——都在路线图上。
 
-完整竞品分析见 [docs/竞品对比分析.md](docs/竞品对比分析.md)。
 
 ---
 
@@ -258,11 +257,10 @@ docker run -d --name dbridge -p 27301:27301 \
 dbridge-open/
 ├── README.md         本文件
 ├── LICENSE           开源协议（示例代码部分）
-├── docs/             文档与截图
-│   ├── 竞品对比分析.md
+├── docs/
 │   └── images/       界面截图
 ├── deploy/
-│   └── docker/       Docker 部署文件（Dockerfile / compose / 构建与升级脚本）
+│   └── docker/       Docker 部署（Dockerfile / docker-compose.yml / 一键安装 install.sh）
 └── examples/         通用示例代码（不涉及核心逻辑）
     ├── DbTypeExample.java       多数据库 JDBC 连接串拼接的通用写法
     └── CronTextExample.java     cron 表达式的人类可读解析示例
