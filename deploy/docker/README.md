@@ -2,16 +2,8 @@
 
 镜像自带 Java 11、8 种数据库驱动与 SeaTunnel 同步引擎，一条命令拉起，数据用 volume 持久化。
 
-本文三种启动方式的关系，先看这张表再往下看：
-
-| 方式 | 你需要先有什么 | 是否自动下载镜像 |
-|---|---|---|
-| 一、一键安装脚本 | 一台能上外网的 Linux 服务器 | ✅ 会（连 Docker 都帮你装） |
-| 二、docker compose | 本机已有 `dbridge:latest` 镜像 + 本仓库的 compose 文件 | ❌ 不会 |
-| 三、docker run | 本机已有 `dbridge:latest` 镜像 | ❌ 不会 |
-
-镜像只有两个来源：**跑过一次方式一**，或**用 curl 从分发地址下载 tar 再 `docker load`**（见第七节）。
-本项目不发布到 Docker Hub，`docker pull` 拉不到。
+**方式一零前置**（连 Docker 都帮你装）；**方式二、三需要本机已有 `dbridge:latest` 镜像**，
+镜像下载命令见第七节。本项目不发布到 Docker Hub，`docker pull` 拉不到。
 
 | 端口 | 用途 |
 |---|---|
@@ -67,8 +59,7 @@ cd dbridge/deploy/docker
 docker compose up -d
 ```
 
-compose 只负责「按 `docker-compose.yml` 里的参数启动容器」，**不会下载镜像**。
-`deploy/docker/` 目录只存在于 GitHub 仓库，Windows 客户端 zip 里没有它。
+compose 只负责按文件启动容器，不下载镜像；`deploy/docker/` 只在 GitHub 仓库里。
 
 ---
 
@@ -113,41 +104,15 @@ bash <(curl -sL https://dbridge.zzzmxxkj.com/install.sh)
 
 ## 七、下载镜像 / 离线部署
 
-### 直接下载（机器能上外网）
-
-镜像包放在分发服务器上，一条 `curl` 就行，不需要 Docker Hub：
-
 ```bash
+# 直接下载（latest 永远指向最新版；-C - 断点续传）
 curl -fL -C - --progress-bar -o dbridge.tar \
   https://dbridge.zzzmxxkj.com/dist/dbridge-docker-latest.tar
 docker load -i dbridge.tar
-```
 
-`dbridge-docker-latest.tar` 是软链，永远指向当前最新版；`-C -` 支持断点续传。
-
-按版本号下载并校验（约 418MB）：
-
-```bash
-V=$(curl -s https://dbridge.zzzmxxkj.com/dist/latest.txt)
-curl -fL -C - --progress-bar -o dbridge.tar \
-  https://dbridge.zzzmxxkj.com/dist/dbridge-docker-$V.tar
-curl -fsSL https://dbridge.zzzmxxkj.com/dist/dbridge-docker-$V.tar.sha256 \
-  | sed "s/dbridge-docker-$V.tar/dbridge.tar/" | sha256sum -c -
-```
-
-### 完全离线（客户内网出不去）
-
-```bash
-# 有网环境导出（约 418MB，也可以直接用上面的 curl 下 tar）
+# 内网离线：有网机器 docker save，拷到客户侧 docker load
 docker save dbridge:latest -o dbridge.tar
-
-# 客户侧导入
-docker load -i dbridge.tar
 ```
-
-导入后按第二节的 `docker run` 启动即可，全程不需要外网。
-
----
 
 ## 八、常见问题
 
