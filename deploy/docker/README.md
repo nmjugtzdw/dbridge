@@ -29,7 +29,7 @@ Docker 镜像里不放源码，只放「主程序 jar + 驱动 + 同步引擎」
 build.bat
 
 :: 2. 一键组装构建上下文（jar + drivers + 精简引擎）
-bash deploy\docker\build-docker.sh 1.0.5
+bash deploy\docker\build-docker.sh 1.0.8
 ```
 
 > `build-docker.sh` 会自动从 `target/`、`drivers/`、`D:/seatunnel`（引擎源目录）拷贝
@@ -55,7 +55,7 @@ DBridge 的同步执行体是 **SeaTunnel 引擎**（独立发行包），不是
 
 ```bash
 cd deploy/docker
-docker build -t dbridge:1.0.5 .
+docker build -t dbridge:1.0.8 .
 ```
 
 ---
@@ -78,10 +78,10 @@ docker run -d \
   --name dbridge \
   -p 27301:27301 \
   -v dbridge-data:/opt/dbridge/data \
-  -e DBRIDGE_LICENSE_URL=https://dbridge.zzzmxxkj.com \
+  -e DBRIDGE_LICENSE_URL=https://dbridge.zzzmxxkj.com:27302 \
   -e TZ=Asia/Shanghai \
   --restart unless-stopped \
-  dbridge:1.0.5
+  dbridge:1.0.8
 ```
 
 ---
@@ -92,10 +92,10 @@ docker run -d \
 
 ```bash
 # 供方侧：导出镜像
-docker save dbridge:1.0.5 -o dbridge-1.0.5-docker.tar
+docker save dbridge:1.0.8 -o dbridge-1.0.8-docker.tar
 
 # 客户侧：导入镜像
-docker load -i dbridge-1.0.5-docker.tar
+docker load -i dbridge-1.0.8-docker.tar
 ```
 
 ---
@@ -158,19 +158,19 @@ Docker 版升级 = **只换镜像 + 重启容器**，`data` 卷（`dbridge-data`
 
 ```bash
 # 本机（改完代码、跑完 build.bat 后）
-bash deploy/docker/build-docker.sh 1.0.6          # 组装新版本 jar+驱动+引擎
-cd deploy && tar -czf dbridge-v1.0.6.tar.gz docker/   # 打 tar
-scp dbridge-v1.0.6.tar.gz ubuntu@服务器IP:/home/ubuntu/
+bash deploy/docker/build-docker.sh 1.0.8          # 组装新版本 jar+驱动+引擎
+cd deploy && tar -czf dbridge-v1.0.8.tar.gz docker/   # 打 tar
+scp dbridge-v1.0.8.tar.gz ubuntu@服务器IP:/home/ubuntu/
 
 # 服务器
-cd /home/ubuntu && tar -xzf dbridge-v1.0.6.tar.gz && cd docker
-sudo docker build -t dbridge:1.0.6 .
+cd /home/ubuntu && tar -xzf dbridge-v1.0.8.tar.gz && cd docker
+sudo docker build -t dbridge:1.0.8 .
 sudo docker rm -f dbridge && sudo docker run -d --name dbridge \
   -p 27301:27301 -v dbridge-data:/opt/dbridge/data \
   -v /etc/machine-id:/etc/machine-id:ro \
-  -e DBRIDGE_LICENSE_URL=https://dbridge.zzzmxxkj.com \
+  -e DBRIDGE_LICENSE_URL=https://dbridge.zzzmxxkj.com:27302 \
   -e DBRIDGE_ENGINE_HOME=/opt/dbridge/engine -e SEATUNNEL_HOME=/opt/dbridge/engine \
-  -e TZ=Asia/Shanghai --restart unless-stopped dbridge:1.0.6
+  -e TZ=Asia/Shanghai --restart unless-stopped dbridge:1.0.8
 ```
 
 > 一条命令封装版：见 `update-docker.sh`（参数：版本号 + 服务器 IP），自动完成

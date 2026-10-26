@@ -13,14 +13,15 @@
 services:
   dbridge:
     build: .
-    image: dbridge:1.0.5
+    image: dbridge:1.0.8
     container_name: dbridge
     restart: unless-stopped
     ports:
       - "27301:27301"
     environment:
       # 授权云端地址（你的授权服务器）。留空则用镜像默认 127.0.0.1:27302
-      DBRIDGE_LICENSE_URL: "https://dbridge.zzzmxxkj.com"
+      # 生产地址固定带 27302 端口：443 已让给软件官网，授权只走 27302
+      DBRIDGE_LICENSE_URL: "https://dbridge.zzzmxxkj.com:27302"
       # 同步引擎目录（镜像内固定路径，无需改动；见 Dockerfile 的 ENV）
       DBRIDGE_ENGINE_HOME: "/opt/dbridge/engine"
       SEATUNNEL_HOME: "/opt/dbridge/engine"

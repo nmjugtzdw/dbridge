@@ -5,7 +5,7 @@
 #
 # 用法：
 #   bash update-docker.sh <版本号> <服务器IP> [ssh账号]
-#   例：bash update-docker.sh 1.0.6 111.231.174.142 ubuntu
+#   例：bash update-docker.sh 1.0.8 111.231.174.142 ubuntu
 #
 # 前提：
 #   1. 已在本机跑过 build.bat 产出 target/dbridge.jar
@@ -26,8 +26,8 @@ ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 CTX="$ROOT/deploy/docker"
 TARBALL="$ROOT/deploy/dbridge-docker-context.tar.gz"
 
-# 服务器端授权地址（与 docker-compose.yml 保持一致）
-LICENSE_URL="${DBRIDGE_LICENSE_URL:-https://dbridge.zzzmxxkj.com}"
+# 服务器端授权地址（与 docker-compose.yml 保持一致；443 留给官网，授权走 27302）
+LICENSE_URL="${DBRIDGE_LICENSE_URL:-https://dbridge.zzzmxxkj.com:27302}"
 
 echo "============================================================"
 echo " DBridge Docker 升级"

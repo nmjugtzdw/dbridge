@@ -18,7 +18,7 @@ FROM eclipse-temurin:11-jre-focal
 LABEL maintainer="木思丁" \
       org.opencontainers.image.title="DBridge" \
       org.opencontainers.image.description="数桥 DBridge · 图形化异构数据库同步控制台" \
-      org.opencontainers.image.version="1.0.5"
+      org.opencontainers.image.version="1.0.8"
 
 # 兜底固定 machine-id：作为「os」指纹因子的最后兜底。
 # 注意：运行时优先挂载宿主机 /etc/machine-id（docker-compose 已做），

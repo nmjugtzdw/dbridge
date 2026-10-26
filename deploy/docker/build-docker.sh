@@ -2,12 +2,12 @@
 # ============================================================
 # DBridge Docker 一键构建脚本
 # 用法：bash deploy/docker/build-docker.sh [版本号]
-#   默认版本号 1.0.5，可传参覆盖，例如 build-docker.sh 1.0.6
+#   默认版本号 1.0.8，可传参覆盖，例如 build-docker.sh 1.0.9
 # 前提：已先运行 build.bat 产出 target/dbridge.jar
 # ============================================================
 set -euo pipefail
 
-VER="${1:-1.0.5}"
+VER="${1:-1.0.8}"
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 CTX="$ROOT/deploy/docker"
 
