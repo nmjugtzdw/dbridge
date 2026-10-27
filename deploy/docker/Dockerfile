@@ -9,11 +9,14 @@
 
 FROM eclipse-temurin:11-jre-focal
 
+# 版本号由构建脚本 --build-arg VERSION=<版本> 注入，发版不用改这个文件
+ARG VERSION=dev
+
 # 元信息
 LABEL maintainer="木思丁" \
       org.opencontainers.image.title="DBridge" \
       org.opencontainers.image.description="数桥 DBridge · 图形化异构数据库同步控制台" \
-      org.opencontainers.image.version="1.0.8"
+      org.opencontainers.image.version="${VERSION}"
 
 # 兜底机器标识：仅在未挂载宿主机 /etc/machine-id 时生效
 RUN echo "dbridge-docker-fixed-machine-id-0001" > /etc/machine-id
