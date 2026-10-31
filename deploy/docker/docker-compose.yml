@@ -19,7 +19,7 @@ services:
     ports:
       - "27301:27301"
     environment:
-      # 授权服务地址（必须带 27302 端口，443 用于官网）
+      # 授权服务地址，照原样填，不要删掉端口
       DBRIDGE_LICENSE_URL: "https://dbridge.zzzmxxkj.com:27302"
       # 首次登录的出厂密码（可选，不设则默认 admin123，登录后引导改密）
       # DBRIDGE_ADMIN_PASSWORD: "ChangeMe123456"
