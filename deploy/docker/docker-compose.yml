@@ -5,7 +5,7 @@
 # 浏览器打开 http://localhost:27301
 #
 # 关键点：
-#   - data 卷持久化（授权文件 + H2 库 + 时间锚点），容器重建不掉授权
+#   - data 卷持久化（程序数据与授权信息），容器重建不掉授权
 #   - 授权云端地址通过 DBRIDGE_LICENSE_URL 环境变量传入
 #   - 连宿主机上的数据库时，用 host.docker.internal（见下方注释）
 # ============================================================
@@ -21,15 +21,12 @@ services:
     environment:
       # 授权服务地址（必须带 27302 端口，443 用于官网）
       DBRIDGE_LICENSE_URL: "https://dbridge.zzzmxxkj.com:27302"
-      # 同步引擎目录（镜像内固定路径，无需改动；见 Dockerfile 的 ENV）
-      DBRIDGE_ENGINE_HOME: "/opt/dbridge/engine"
-      SEATUNNEL_HOME: "/opt/dbridge/engine"
-      # 首次登录的出厂密码（可选，不设则默认 admin123，登录后强制改密）
+      # 首次登录的出厂密码（可选，不设则默认 admin123，登录后引导改密）
       # DBRIDGE_ADMIN_PASSWORD: "ChangeMe123456"
-      # 时区（影响日志时间戳与 cron 调度）
+      # 时区（影响日志时间与定时任务触发时刻）
       TZ: "Asia/Shanghai"
     volumes:
-      # 数据卷：授权文件、H2 库、时间锚点都在这里，务必持久化
+      # 数据卷：程序数据与授权信息都在这里，务必持久化
       - dbridge-data:/opt/dbridge/data
       # 日志挂出来方便排障（可选）
       - dbridge-logs:/opt/dbridge/logs

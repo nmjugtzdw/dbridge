@@ -9,7 +9,7 @@
 # 仅在需要回滚到某个历史版本时才传版本号（该版本的 tar 必须仍在分发目录）：
 #
 # 端口说明：
-#   客户端对外 27301；授权服务走后端 27302（nginx 终结 TLS → 127.0.0.1:27312）
+#   客户端对外端口 27301，装好后浏览器访问该端口即可
 #
 # 脚本会做：
 #   1. 解析目标版本（不传参数 = 装最新）
@@ -188,8 +188,6 @@ docker run -d --name "${CONTAINER}" \
   -v dbridge-data:/opt/dbridge/data \
   -v /etc/machine-id:/etc/machine-id:ro \
   -e DBRIDGE_LICENSE_URL="${LICENSE_URL}" \
-  -e DBRIDGE_ENGINE_HOME=/opt/dbridge/engine \
-  -e SEATUNNEL_HOME=/opt/dbridge/engine \
   -e TZ=Asia/Shanghai \
   --restart unless-stopped \
   "dbridge:${VER}" >/dev/null || err "容器启动失败，查看日志：docker logs ${CONTAINER}"

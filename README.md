@@ -23,8 +23,8 @@
 
 *DBridge turns cross-database data movement into a point-and-click task. No SQL, no config syntax — just fill in connections, check the tables and fields you want to sync, and let the program handle the rest. It checks first, trial-runs, then syncs for real, explaining every step in plain language.*
 
-> ⚠️ 本仓库用于**项目介绍与公开信息展示**，不含完整源码。核心实现为闭源，这里只放少量不涉及核心逻辑的通用示例代码。
-> *This repository is for project introduction and public information only. The core implementation is closed-source; only a few non-core generic example code snippets are included.*
+> ⚠️ 本仓库只用于**项目介绍与公开信息展示**，不含任何源码。产品为闭源商业软件，这里放的是说明文档、界面截图和部署方式。
+> *This repository is for project introduction and public information only. It contains no source code. The product is closed-source; what you find here is documentation, screenshots, and deployment instructions.*
 
 ---
 
@@ -260,18 +260,16 @@ docker run -d --name dbridge -p 27301:27301 \
 ```
 dbridge-open/
 ├── README.md         本文件
-├── LICENSE           开源协议（示例代码部分）
+├── LICENSE           使用许可
 ├── docs/
 │   └── images/       界面截图
-├── deploy/
-│   └── docker/       Docker 部署（Dockerfile / docker-compose.yml / 一键安装 install.sh）
-└── examples/         少量通用示例，不涉及产品核心实现
+└── deploy/
+    └── docker/       Docker 部署文件（自建容器时用得上）
 ```
 
 ---
 
 ## ⚠️ 免责声明 / Disclaimer
 
-- 本仓库仅用于**项目介绍与公开信息展示**，不含完整源码。
-- `examples/` 下的内容仅作技术交流展示，可自由参考，但**不代表完整产品的实现方式**。
-- 完整产品为闭源商业软件。
+- 本仓库仅用于**项目介绍与公开信息展示**，不含任何源码。
+- 完整产品为闭源商业软件，界面、功能与文档版权归作者所有。
