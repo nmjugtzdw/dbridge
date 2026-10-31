@@ -6,7 +6,7 @@
 
 *DBridge · A visual database sync tool for people who don't write config files.*
 
-免装 JDK · 内网离线可用 · 体检 → 试跑 → 正式同步三层防错护栏
+免装运行环境 · 内网离线可用 · 体检 → 试跑 → 正式同步三层防错护栏
 
 [![GitHub release](https://img.shields.io/github/v/release/nmjugtzdw/dbridge?style=flat-square)](https://github.com/nmjugtzdw/dbridge/releases)
 [![License](https://img.shields.io/badge/license-Commercial-red?style=flat-square)](LICENSE)
@@ -123,10 +123,10 @@
 
 ## 🆚 与市面工具的对比 / Comparison
 
-| 维度 | 数桥 DBridge | SeaTunnel / DataX | Flink CDC | SyncTool |
+| 维度 | 数桥 DBridge | 开源配置式工具 | 开源实时同步工具 | 同类图形化工具 |
 |---|---|---|---|---|
 | 使用方式 | **图形化点选** | 写配置/代码 | 写配置/代码 | 图形化点选 |
-| 免装环境 | ✅ 内置运行环境 | ❌ | ❌ | ⚠️ 需 Java 17+ |
+| 免装环境 | ✅ 内置运行环境 | ❌ | ❌ | ⚠️ 需自备运行环境 |
 | 内网离线 | ✅ | ⚠️ | ❌ | ✅ |
 | 体检/试跑护栏 | ✅ 三层 | ❌ | ❌ | ❌ |
 | 数据一致性校验 | ✅ 优/良/中/差 | ❌ | ❌ | ❌ |
@@ -157,13 +157,13 @@ DBridge 支持三种部署方式，功能完全一致，按你的环境任选其
 
 | 包 | 大小 | 说明 |
 |---|---|---|
-| **lite 版** | 约 60 MB | 不含 Java。解压后先跑「环境检测.bat」，自动下载 Java 与数据库驱动（需能上外网） |
-| **full 版** | 约 117 MB | 内置 Java，解压即用，适合内网、不能上外网的机器 |
+| **lite 版** | 约 60 MB | 不含运行环境。解压后先跑「环境检测.bat」，自动下载运行环境与数据库驱动（需能上外网） |
+| **full 版** | 约 117 MB | 已内置运行环境，解压即用，适合内网、不能上外网的机器 |
 
 #### 三步装起来 / 3-Step Install
 
 1. **解压**：把压缩包整个解压到硬盘（例如 `D:\DBridge`）。不要放 `C:\Program Files`，也不要在压缩包里直接双击运行——那里没有写权限。路径里尽量不要有中文。
-2. **检测环境**：双击「环境检测.bat」，逐项检查并给出结论（`OK` / `注意` / `失败`）。缺 Java 自动下载、缺驱动自动补齐，全部通过后生成环境配置。
+2. **检测环境**：双击「环境检测.bat」，逐项检查并给出结论（`OK` / `注意` / `失败`）。缺运行环境自动下载、缺驱动自动补齐，全部通过后生成环境配置。
 3. **启动**：双击「启动.bat」，等约 10 秒，浏览器打开 `http://localhost:27301`。那个黑色窗口就是服务本身，关掉即停止服务。
 
 #### 开机自启 / Auto-Start
@@ -172,7 +172,7 @@ DBridge 支持三种部署方式，功能完全一致，按你的环境任选其
 
 ### 🐧 Linux 部署
 
-Linux 服务器裸机部署，解压后运行启动脚本即可（同样内置 Java，无需预装 JDK）：
+Linux 服务器裸机部署，解压后运行启动脚本即可（同样已内置运行环境，无需另外安装）：
 
 ```bash
 # 1. 解压
@@ -232,7 +232,7 @@ docker run -d --name dbridge -p 27301:27301 \
 
 | 文件 / 目录 | 用途 |
 |---|---|
-| `环境检测.bat` | 检查环境、自动下载 Java 与数据库驱动（Windows lite 版） |
+| `环境检测.bat` | 检查环境、自动下载运行环境与数据库驱动（Windows lite 版） |
 | `启动.bat` / `start.sh` | 启动控制台（Windows / Linux） |
 | `lib\` | 程序文件，**不用动** |
 | `runtime\` | 自带的运行环境（lite 版没有，检测时自动下载） |

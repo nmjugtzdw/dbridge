@@ -16,7 +16,7 @@
 #   2. 检查/安装 Docker
 #   3. 下载镜像 tar（断点续传）并校验 sha256
 #   4. docker load 导入镜像
-#   5. docker run 启动容器（数据持久化 + 授权 URL + 引擎环境变量）
+#   5. docker run 启动容器（数据持久化 + 授权地址 + 时区）
 #   6. 等服务真正响应后再报成功
 #
 # 设计原则：
@@ -224,9 +224,9 @@ if [ "${READY}" -eq 1 ]; then
   RESP="$(curl -fsS --max-time 3 "http://127.0.0.1:${PORT}/api/about/version" 2>/dev/null)"
   RUN_VER="$(printf '%s' "${RESP}" | sed -n 's/.*"version":"\([^"]*\)".*/\1/p')"
   if [ -n "${RUN_VER}" ] && [ "${RUN_VER}" != "${VER}" ]; then
-    warn "接口已响应，但运行版本是 ${RUN_VER}（期望 ${VER}）"
+    warn "服务已响应，但运行版本是 ${RUN_VER}（期望 ${VER}）"
   else
-    ok "接口已响应 v${RUN_VER:-${VER}}"
+    ok "服务已响应 v${RUN_VER:-${VER}}"
   fi
 else
   warn "服务尚未响应，可能仍在启动；稍后用 docker logs -f ${CONTAINER} 观察"
