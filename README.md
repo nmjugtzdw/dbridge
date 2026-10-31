@@ -10,8 +10,6 @@
 
 [![GitHub release](https://img.shields.io/github/v/release/nmjugtzdw/dbridge?style=flat-square)](https://github.com/nmjugtzdw/dbridge/releases)
 [![License](https://img.shields.io/badge/license-Commercial-red?style=flat-square)](LICENSE)
-[![Java](https://img.shields.io/badge/Java-11-blue?style=flat-square)]()
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.7.18-brightgreen?style=flat-square)]()
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux-lightgrey?style=flat-square)]()
 [![Docker](https://img.shields.io/badge/Docker-支持-blue?style=flat-square&logo=docker)](deploy/docker/README.md)
 
@@ -21,7 +19,7 @@
 
 ## 📖 简介 / Introduction
 
-数桥（DBridge）把数据库之间的数据搬运做成了「点点鼠标就能完成」的事：不需要手写 SQL、不需要懂 SeaTunnel / 配置文件的语法，填好连接、勾选要同步的表和字段，剩下的交给程序。它会**先体检、再试跑、最后才正式同步**，全程用"人话"告诉你每一步发生了什么。
+数桥（DBridge）把数据库之间的数据搬运做成了「点点鼠标就能完成」的事：不需要手写 SQL、不需要懂配置文件的语法，填好连接、勾选要同步的表和字段，剩下的交给程序。它会**先体检、再试跑、最后才正式同步**，全程用"人话"告诉你每一步发生了什么。
 
 *DBridge turns cross-database data movement into a point-and-click task. No SQL, no config syntax — just fill in connections, check the tables and fields you want to sync, and let the program handle the rest. It checks first, trial-runs, then syncs for real, explaining every step in plain language.*
 
@@ -50,7 +48,7 @@
 
 第一次照着看一遍，五分钟上手。每张表上线前可做「体检」（只读），按优/良/中/差分级，发现差异可「一键修复」。
 
-### JDBC 驱动管理 / Driver Management
+### 驱动管理 / Driver Management
 
 ![驱动管理](docs/images/drivers.png)
 
@@ -62,14 +60,14 @@
 
 - **图形化数据源管理**：MySQL / MariaDB / Oracle / PostgreSQL / SQL Server / TiDB / OceanBase / Greenplum 八种数据库，填主机、端口、账号、密码即可，测试连接一键通过。
 - **选表选字段**：不用手写 SQL 或配置文件，勾选要同步的表和字段就行。
-- **自动建目标表**：目标库没有对应表时自动建表，字段类型自动映射。
-- **字段自动匹配**：源表与目标表字段按同名、别名、中文注释等 9 级打分自动对应，省去手工对齐。
-- **定时调度**：按 cron 频率自动跑，支持全量 / 增量（水位线）同步。
-- **增量水位**：按时间戳 / 自增主键推进，只同步新增和变更的数据，不重复、不漏数。
-- **断点续传**：大表按主键切片搬运，中断后从断点继续，已完成分片不重搬。
-- **运行历史与日志**：每次运行留痕，日志可按错误过滤、可下载。
-- **试跑校验**：先读几行到临时表回读校验，确认无误再正式同步。
-- **一键换驱动**：按目标库实际版本推荐并替换 JDBC 驱动，不用自己挑版本。
+- **自动建目标表**：目标库没有对应表时自动建表，字段类型自动对应。
+- **字段自动匹配**：源表和目标表的字段按字段名、别名、中文注释自动对应，省去手工一个个对齐。
+- **定时调度**：按你设的频率自动跑，支持全量同步和增量同步。
+- **只搬变化的数据**：按时间或编号判断哪些是新的、哪些改过，只搬这部分，不重复、不漏数。
+- **大表中断能接着搬**：整表搬运中途断了，下次从断的地方继续，已经搬完的部分不会重搬。
+- **运行历史与日志**：每次运行都留记录，日志可以只看错误行，也能下载下来发人。
+- **试跑校验**：先拿几行数据试一遍，确认无误再正式同步。
+- **一键换驱动**：数据库版本和驱动不匹配时，程序自己推荐该用哪个版本，点一下就换好。
 
 ---
 
@@ -82,21 +80,44 @@
    随时点          正式表零改动                前置体检不过直接拒绝
 ```
 
-1. **体检 / Check**：15+ 项检查（连接 / 权限 / 类型 / 主键冲突 / 非空列等），按 BLOCK / WARN / OK 分级。
-2. **试跑 / Trial Run**：只读几行写进临时表，回读校验无误后自动删表，绝不碰正式表、绝不推进水位。
-3. **正式同步 / Sync**：体检有 BLOCK 直接拒绝，带着已知错误去写数据这种事从一开始就不允许发生。
+1. **体检 / Check**：十几项检查（能不能连上、有没有权限、字段类型对不对得上、主键会不会撞、必填列有没有数据等），结论分成「必须解决」「建议注意」「没问题」三档，用大白话说明该干什么。
+2. **试跑 / Trial Run**：只读几行数据写进临时表，回读核对无误后自动删表，**绝不碰正式表**。试跑也不会影响正式同步的进度判断，跑完正式同步照样从该开始的地方开始。
+3. **正式同步 / Sync**：体检有「必须解决」的问题就直接拒绝运行。带着已知的毛病去写数据，从一开始就不允许发生。
 
 ### 报错说人话 / Human-Readable Errors
 
-连接失败、权限不足、类型不匹配、主键冲突等 20+ 类异常，都会被翻译成「原因 + 该干什么」，而不是甩给你一段英文堆栈。
+连不上、没权限、类型不对、主键冲突等二十多类常见问题，都会翻译成「原因 + 你该怎么办」，而不是甩给你一段英文报错。
 
-### 增量不重复、不漏数 / Idempotent, Lossless Incremental Sync
+### 重复跑不写重，中断了不漏数 / Idempotent, Lossless Incremental Sync
 
-水位取「运行开始时的最大值」，查询起点再回退，靠 upsert 吸收重叠；水位精度到毫秒，减少同秒重复读。毫秒时间戳、数字型主键等 6 种水位类型分别处理，不会出现"数字被加了引号导致排序错乱"这类隐蔽问题。
+同一批数据重复同步不会变成两倍，中途失败接着跑也不会漏掉中间的记录。时间、日期、自增编号等不同类型的判断依据都做了处理，不会因为认不出类型而多搬或漏搬。
 
 ### 断网也能用 / Works Offline
 
-数据同步在你的内网/本机跑，不依赖外网。JDBC 驱动、Java 环境都内置或可离线，常见版本驱动已预置，完全不出网的客户也能正常使用与授权。
+数据同步在你的内网或本机跑，不依赖外网。运行环境和数据库驱动都内置或可离线安装，常见版本驱动已提前备好，完全不出网的客户也能正常使用和授权。
+
+---
+
+## 📊 实测数据 / Measured Performance
+
+固定条件：单表 **10 万行**、局域网、控制台与数据库在同一台机器上（2 核 / 11.4 GB）。
+
+| 场景 | 耗时 |
+|---|---|
+| MySQL → MySQL | 16.0 秒 |
+| MySQL → PostgreSQL | 15.4 秒 |
+| MySQL → Oracle | 17.9 秒 |
+| MySQL → SQL Server | 38.7 秒 |
+| Oracle → MySQL | 16.8 秒 |
+| Oracle → SQL Server（最慢组合） | 48.9 秒 |
+
+- 每一组的读 / 写行数都是 **100,000 / 100,000**，并且**逐行核对过结果**，不只是"跑完了没报错"。
+- 上表是目标表已存在时的稳定耗时；第一次由程序自动建表只多约 0.6 秒。
+- SQL Server 做目标会慢 3–4 倍，这是它本身的写入特点，不是故障，安排维护窗口时按 40–55 秒估。
+- 机器负载会明显影响速度：同一套脚本在更空闲时测得 MySQL / PostgreSQL 约 **7.8 秒**。对外按 **「10 万行 15–20 秒」** 估比较稳妥，不要承诺固定吞吐。
+- **适用规模**：中小企业 ERP / 业务库，单表 10–20 万行。百万行级不在目标场景内，不做承诺。
+
+**回归情况**：MySQL、MariaDB、PostgreSQL、Oracle、SQL Server 五套真实数据库全量回归 55 项通过；另有 109 条自动化检查，每次发版前全部跑一遍。
 
 ---
 
@@ -105,31 +126,18 @@
 | 维度 | 数桥 DBridge | SeaTunnel / DataX | Flink CDC | SyncTool |
 |---|---|---|---|---|
 | 使用方式 | **图形化点选** | 写配置/代码 | 写配置/代码 | 图形化点选 |
-| 免装环境 | ✅ 内置 JDK | ❌ | ❌ | ⚠️ 需 Java 17+ |
+| 免装环境 | ✅ 内置运行环境 | ❌ | ❌ | ⚠️ 需 Java 17+ |
 | 内网离线 | ✅ | ⚠️ | ❌ | ✅ |
 | 体检/试跑护栏 | ✅ 三层 | ❌ | ❌ | ❌ |
 | 数据一致性校验 | ✅ 优/良/中/差 | ❌ | ❌ | ❌ |
-| 断点续传 | ✅ 切片续传 | ❌ | ✅ | ⚠️ |
-| 增量同步 | ✅ 6 种水位 | ⚠️ 手动时间戳 | ✅ | ✅ |
+| 大表中断续传 | ✅ 从断点继续 | ❌ | ✅ | ⚠️ |
+| 增量同步 | ✅ 自动识别时间/编号 | ⚠️ 手动填时间 | ✅ | ✅ |
 | CDC 秒级实时 | ❌ | ⚠️ | ✅ | ❌ |
 | 国产库（达梦等） | ⚠️ 部分（OceanBase） | ⚠️ 部分 | ⚠️ | ✅ |
 
-**我们最强的三点**：① 免装环境的图形化（目标用户零门槛）；② 三层防错护栏 + 一致性校验（写坏数据前先拦住，独家）；③ 断点续传 + 增量水位（不重不漏）。
+**我们最强的三点**：① 免装环境的图形化（目标用户零门槛）；② 三层防错护栏 + 一致性校验（写坏数据前先拦住，独家）；③ 大表续传 + 增量同步（不重不漏）。
 
 **我们暂时弱的三点**：国产库覆盖（已支持 OceanBase，达梦/金仓等在路线图）、存储过程/视图等对象同步、CDC 秒级实时——都在路线图上。
-
-
----
-
-## 🗄️ 技术栈 / Tech Stack
-
-| 层 | 技术 |
-|---|---|
-| 后端 | Java 11 · Spring Boot |
-| 数据访问 | JDBC（MySQL / MariaDB / Oracle / PostgreSQL / SQL Server / TiDB / OceanBase / Greenplum 驱动） |
-| 存储 | H2（嵌入式文件库） |
-| 前端 | 原生 HTML / CSS / JS（单页，无框架） |
-| 同步引擎 | Apache SeaTunnel |
 
 ---
 
@@ -145,12 +153,12 @@ DBridge 支持三种部署方式，功能完全一致，按你的环境任选其
 
 ### 🪟 Windows 部署
 
-分两种包，功能完全一致，只差 Java 环境：
+分两种包，功能完全一致，只差运行环境：
 
 | 包 | 大小 | 说明 |
 |---|---|---|
-| **lite 版** | 约 60 MB | 不含 Java。解压后先跑「环境检测.bat」，自动下载 JDK 与数据库驱动（需能上外网） |
-| **full 版** | 约 117 MB | 内置 Java 11，解压即用，适合内网、不能上外网的机器 |
+| **lite 版** | 约 60 MB | 不含 Java。解压后先跑「环境检测.bat」，自动下载 Java 与数据库驱动（需能上外网） |
+| **full 版** | 约 117 MB | 内置 Java，解压即用，适合内网、不能上外网的机器 |
 
 #### 三步装起来 / 3-Step Install
 
@@ -212,6 +220,7 @@ docker run -d --name dbridge -p 27301:27301 \
 
 浏览器打开 `http://localhost:27301`。
 
+> 上面命令里的 `/etc/machine-id` 和 `DBRIDGE_LICENSE_URL` 两项跟授权绑定有关，**保持原样即可**，不要删也不要改。
 > 镜像只放在我们自己的服务器上，没发到 Docker Hub，`docker pull` 拉不到。
 > 内网离线：`docker save dbridge:latest -o dbridge.tar` 带到客户侧 `docker load -i`。
 
@@ -225,8 +234,8 @@ docker run -d --name dbridge -p 27301:27301 \
 |---|---|
 | `环境检测.bat` | 检查环境、自动下载 Java 与数据库驱动（Windows lite 版） |
 | `启动.bat` / `start.sh` | 启动控制台（Windows / Linux） |
-| `lib\dbridge.jar` | 主程序 |
-| `runtime\jdk11\` | 内置 Java 11（lite 版没有，检测时下载） |
+| `lib\` | 程序文件，**不用动** |
+| `runtime\` | 自带的运行环境（lite 版没有，检测时自动下载） |
 | `drivers\` | 数据库驱动（MySQL / MariaDB / Oracle / PostgreSQL / SQL Server / TiDB / OceanBase / Greenplum） |
 | `data\` | 你的数据、账号等，**备份就拷这个目录** |
 | `logs\` | 运行日志，出问题时打包这个目录发给支持方 |
@@ -256,9 +265,7 @@ dbridge-open/
 │   └── images/       界面截图
 ├── deploy/
 │   └── docker/       Docker 部署（Dockerfile / docker-compose.yml / 一键安装 install.sh）
-└── examples/         通用示例代码（不涉及核心逻辑）
-    ├── DbTypeExample.java       多数据库 JDBC 连接串拼接的通用写法
-    └── CronTextExample.java     cron 表达式的人类可读解析示例
+└── examples/         少量通用示例，不涉及产品核心实现
 ```
 
 ---
@@ -266,5 +273,5 @@ dbridge-open/
 ## ⚠️ 免责声明 / Disclaimer
 
 - 本仓库仅用于**项目介绍与公开信息展示**，不含完整源码。
-- `examples/` 下的代码仅作技术交流展示，可自由参考，但**不代表完整产品的实现方式**。
+- `examples/` 下的内容仅作技术交流展示，可自由参考，但**不代表完整产品的实现方式**。
 - 完整产品为闭源商业软件。
